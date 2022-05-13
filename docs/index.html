@@ -1,0 +1,119 @@
+<html>
+	<head>
+		<script type="module">
+			import * as optimizely_flag_dependencies from "./optimizely_flag_dependencies.js";
+
+			/**
+			  * Handle a "Decide" button click
+				*/
+			function decide(flag) {
+				console.log(`Decide button clicked for ${flag}`);
+			
+				// Instantiate an Optimizely client object
+				var optimizelyClient = optimizely_flag_dependencies.createInstance({
+					sdkKey: document.getElementById("sdkKey").value
+				});
+				
+				optimizelyClient.onReady().then(() => {
+					
+					// Create user context
+					var userId = "user123";
+					var attrs = {
+						in_audience_1: document.getElementById("in_audience_1").checked,
+						in_audience_2: document.getElementById("in_audience_2").checked
+					}
+					var user = optimizelyClient.createUserContext(userId, attrs);
+					console.log(`Created user context with userId=${userId} and attrs=${JSON.stringify(attrs)}`);
+
+					let isOn = optimizelyClient.decideWithDependencies(user, flag).enabled;
+					let flagElt = document.getElementById(flag);
+					flagElt.innerHTML = isOn ? "ON" : "OFF";
+					flagElt.setAttribute("state", isOn ? "on" : "off");
+				})
+			}
+
+		</script>
+		<style>
+			div {
+				padding: 10px;
+			}
+
+			span[state="on"] {
+				color: green;
+			}
+
+			span[state="off"] {
+				color: red;
+			}
+
+			.flex-container {
+				display: flex;
+			}
+
+			.flex-child {
+				flex: 1;
+				width: 800px;
+			}  
+
+			.flex-child:first-child {
+				margin-right: 10px;
+				flex-basis: 30px;
+				flex-grow: 0;
+				flex-shrink: 0;
+				margin: 10px 0 10 0;
+			} 
+		</style>
+	</head>
+	<body>
+		<div>
+			<h1>Flag Dependencies Demo</h1>
+			<p>A demonstration of flag dependencies with <a href="https://docs.developers.optimizely.com/full-stack/v4.0/docs">Optimizely Full Stack</a></p>
+
+			<h3>SDK Settings</h3> 
+			User ID: <input type="text" id="userId" name="userId" value="user123" style="width: 300px;"></input><br/>
+			SDK Key: 
+			<input type="text" id="sdkKey" name="sdkKey" value="LbmzK7viE2J2bP5ozmZR9" style="width: 300px;"></input>
+
+
+			<h3>User Settings</h3>
+			<input type="checkbox" id="in_audience_1" name="in_audience_1" />
+			<label for="in_audience_1"> In <code>audience_1</code></label><br/>
+			<input type="checkbox" id="in_audience_2" name="in_audience_2" />
+			<label for="in_audience_2"> In <code>audience_2</code></label>
+			
+			<h3>Stateless Flag Dependencies</h3>
+			<i>Stateless</i> flag dependencies are satisfied when the independent flags <i>would have been enabled</i>,
+			whether or not they were <i>actually enabled</i> at any point previously.
+
+			<div class="flex-container">
+				<div class="flex-child">
+					<button onClick="decide('flag_1')">Decide</button>
+				</div>
+				<div class="flex-child">
+					<code>flag_1</code>: <code><span id="flag_1"></span></code><br/>
+					Targeted at <code>audience_1</code>
+				</div>
+			</div>
+
+			<div class="flex-container">
+				<div class="flex-child">
+					<button onClick="decide('flag_2')">Decide</button>
+				</div>
+				<div class="flex-child">
+					<code>flag_2</code>: <code><span id="flag_2"></span></code><br/>
+					Targeted at <code>audience_2</code>
+				</div>
+			</div>
+
+			<div class="flex-container">
+				<div class="flex-child">
+					<button onClick="decide('flag_2')">Decide</button>
+				</div>
+				<div class="flex-child">
+					<code>flag_3</code>: <code><span id="flag_3"></span></code><br/>
+					Targeted at <code>everyone</code> but depends on <code>flag_1</code> and <code>flag_2</code>
+				</div>
+			</div>		
+		</div>
+	</body>
+</html>
