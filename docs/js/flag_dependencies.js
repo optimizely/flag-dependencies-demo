@@ -1,4 +1,5 @@
-import "https://unpkg.com/@optimizely/optimizely-sdk/dist/optimizely.browser.umd.min.js";
+// import "https://unpkg.com/@optimizely/optimizely-sdk/dist/optimizely.browser.umd.min.js";
+import "./optimizely.browser.umd.min.js";
 
 /**
  * Returns an Optimizely client instance with an additional bound method: decideWithDependencies
@@ -20,7 +21,7 @@ function createInstance(config) {
  */
 function decideWithDependencies(userContext, flagKey, options) {
 	var config = this.getOptimizelyConfig();
-	
+
 	// Check dependencies
 	if (config.featuresMap.hasOwnProperty(flagKey)) {
 
@@ -34,11 +35,11 @@ function decideWithDependencies(userContext, flagKey, options) {
 				console.log(`Checking dependency: ${dependency}`);
 
 				// If the dependency is not enabled, force the "off" variation to be returned
-				if (userContext.decide(dependency, { DISABLE_DECISION_EVENT : true }).enabled) {
+				if (userContext.decide(dependency, { DISABLE_DECISION_EVENT: true }).enabled) {
 					console.log(`${flagKey} dependency ${dependency} is enabled`);
 				} else {
 					console.log(`${flagKey} dependency ${dependency} is disabled`);
-					console.log(userContext.setForcedDecision({flagKey:flagKey}, {variationKey:"off"}));
+					console.log(userContext.setForcedDecision({ flagKey: flagKey }, { variationKey: "off" }));
 				}
 			});
 
@@ -50,7 +51,7 @@ function decideWithDependencies(userContext, flagKey, options) {
 	var decision = userContext.decide(flagKey, options);
 
 	// Remove the forced decision rule
-	userContext.removeForcedDecision({flagKey: flagKey, ruleKey: null});
+	userContext.removeForcedDecision({ flagKey: flagKey, ruleKey: null });
 
 	return decision;
 };

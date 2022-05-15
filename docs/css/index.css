@@ -1,0 +1,37 @@
+.container {
+    max-width: 800px; 
+}
+
+.docs-header {
+    text-transform: uppercase;
+    font-size: 1.4rem;
+    letter-spacing: .2rem;
+    font-weight: 600; 
+}
+
+.on {
+    color: green;
+}
+
+.off {
+    color: red;
+}
+
+.flag {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 10px;
+    background: #F1F1F1;
+    border: 1px solid #E1E1E1;
+    border-radius: 4px;
+}
+
+.flag-cfg {
+    font-family: monospace;
+}
+
+.global-config {
+    padding: 10px;
+    float: right;
+}
+

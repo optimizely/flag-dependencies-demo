@@ -1,119 +1,104 @@
 <html>
-	<head>
-		<script type="module">
-			import * as optimizely_flag_dependencies from "./optimizely_flag_dependencies.js";
 
-			/**
-			  * Handle a "Decide" button click
-				*/
-			function decide(flag) {
-				console.log(`Decide button clicked for ${flag}`);
-			
-				// Instantiate an Optimizely client object
-				var optimizelyClient = optimizely_flag_dependencies.createInstance({
-					sdkKey: document.getElementById("sdkKey").value
+<head>
+	<title>Flag Dependencies Demo - Optimizely Full Stack</title>
+	<meta name="description" content="A demo of dependent flags using Optimizely Full Stack">
+	<meta name="author" content="Peter Koomen">
+
+	<!--<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>-->
+	<script defer src="./js/alpine.cdn.min.js"></script>
+	<script type="module">
+		import * as optimizely from "./js/flag_dependencies.js";
+
+		// Load default static datafile
+		fetch("./js/8Aee8gXFsj4apUcNx59TD.json").then(response => {
+			return response.json();
+		}).then(datafile => {
+
+			window.decideWithDependencies = (flagKey, userId, attrs = {}) => {
+				let optimizelyClient = optimizely.createInstance({
+					datafile: datafile
 				});
-				
-				optimizelyClient.onReady().then(() => {
-					
-					// Create user context
-					var userId = "user123";
-					var attrs = {
-						in_audience_1: document.getElementById("in_audience_1").checked,
-						in_audience_2: document.getElementById("in_audience_2").checked
-					}
-					var user = optimizelyClient.createUserContext(userId, attrs);
-					console.log(`Created user context with userId=${userId} and attrs=${JSON.stringify(attrs)}`);
+				let user = optimizelyClient.createUserContext(userId, attrs);
+				return optimizelyClient.decideWithDependencies(user, flagKey);
+			};
 
-					let isOn = optimizelyClient.decideWithDependencies(user, flag).enabled;
-					let flagElt = document.getElementById(flag);
-					flagElt.innerHTML = isOn ? "ON" : "OFF";
-					flagElt.setAttribute("state", isOn ? "on" : "off");
-				})
-			}
+		})
 
-		</script>
-		<style>
-			div {
-				padding: 10px;
-			}
+	</script>
 
-			span[state="on"] {
-				color: green;
-			}
+	<link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="css/skeleton.css">
+	<link rel="stylesheet" href="css/normalize.css">
+	<link rel="stylesheet" href="css/index.css">
+</head>
 
-			span[state="off"] {
-				color: red;
-			}
+<body>
+	<div class="container" x-data=" { 
+		sdkKey: 'abc123',
+		userId: 'user1234567', 
+		attrs: {
+			'in_audience_1': false,
+			'in_audience_2': false
+		}
+	}">
 
-			.flex-container {
-				display: flex;
-			}
-
-			.flex-child {
-				flex: 1;
-				width: 800px;
-			}  
-
-			.flex-child:first-child {
-				margin-right: 10px;
-				flex-basis: 30px;
-				flex-grow: 0;
-				flex-shrink: 0;
-				margin: 10px 0 10 0;
-			} 
-		</style>
-	</head>
-	<body>
-		<div>
-			<h1>Flag Dependencies Demo</h1>
-			<p>A demonstration of flag dependencies with <a href="https://docs.developers.optimizely.com/full-stack/v4.0/docs">Optimizely Full Stack</a></p>
-
-			<h3>SDK Settings</h3> 
-			User ID: <input type="text" id="userId" name="userId" value="user123" style="width: 300px;"></input><br/>
-			SDK Key: 
-			<input type="text" id="sdkKey" name="sdkKey" value="LbmzK7viE2J2bP5ozmZR9" style="width: 300px;"></input>
-
-
-			<h3>User Settings</h3>
-			<input type="checkbox" id="in_audience_1" name="in_audience_1" />
-			<label for="in_audience_1"> In <code>audience_1</code></label><br/>
-			<input type="checkbox" id="in_audience_2" name="in_audience_2" />
-			<label for="in_audience_2"> In <code>audience_2</code></label>
-			
-			<h3>Stateless Flag Dependencies</h3>
-			<i>Stateless</i> flag dependencies are satisfied when the independent flags <i>would have been enabled</i>,
-			whether or not they were <i>actually enabled</i> at any point previously.
-
-			<div class="flex-container">
-				<div class="flex-child">
-					<button onClick="decide('flag_1')">Decide</button>
+		<div class="global-config">
+			<div class="row">
+				<div class="three columns">
+					sdkKey:
 				</div>
-				<div class="flex-child">
-					<code>flag_1</code>: <code><span id="flag_1"></span></code><br/>
-					Targeted at <code>audience_1</code>
+				<div class="three columns">
+					<input type="text" x-model="sdkKey"></input>
+				</div>
+			</div>
+			<div class="row">
+				<div class="three columns">
+					userId:
+				</div>
+				<div class="three columns">
+					<input type="text" x-model="userId"></input>
 				</div>
 			</div>
 
-			<div class="flex-container">
-				<div class="flex-child">
-					<button onClick="decide('flag_2')">Decide</button>
-				</div>
-				<div class="flex-child">
-					<code>flag_2</code>: <code><span id="flag_2"></span></code><br/>
-					Targeted at <code>audience_2</code>
-				</div>
-			</div>
-
-			<div class="flex-container">
-				<div class="flex-child">
-					<button onClick="decide('flag_2')">Decide</button>
-				</div>
-				<div class="flex-child">
-					<code>flag_3</code>: <code><span id="flag_3"></span></code><br/>
-					Targeted at <code>everyone</code> but depends on <code>flag_1</code> and <code>flag_2</code>
-				</div>
-			</div>		
 		</div>
-	</body>
+
+		<section class="header">
+			<h2 class="title">Flag Dependencies Demo</h2>
+		</section>
+
+		<div class="docs-section" id="intro">
+
+			<h6 class="docs-header">What are flag dependencies?</h6>
+			<p>First things first: a
+				<a
+					href="https://docs.developers.optimizely.com/experimentation/v4.0.0-full-stack/docs/create-feature-flags">
+					feature flag</a> allows you to turn software functionality on or off, or otherwise configure its
+				behavior, without deploying new code.
+			</p>
+
+			<p>Here's an example of a feature flag that uses a 50/50 <a
+					href="https://docs.developers.optimizely.com/experimentation/v4.0.0-full-stack/docs/run-a-b-tests">A/B
+					test rule</a> to decide whether it is
+				<span class="on">on</span> or <span class="off">off</span>. Try changing the <code>userId</code> value
+				in the upper-right and then click the "Decide" button.
+			</p>
+
+			<div class="flag" x-data="{ flagKey: 'example_flag', variationKey: '...' }">
+				<a class="button button-primary u-pull-right"
+					@click="variationKey = window.decideWithDependencies(flagKey, userId, attrs).variationKey"
+					href="#">Decide</a>
+				<div class="flag-cfg">
+					flagKey: <span x-text="flagKey"></span><br />
+					variation: <span x-text="variationKey" :class="variationKey == 'off' ? 'off' : 'on'"></span>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	</div>
+	</div>
+
+</body>
+
 </html>
