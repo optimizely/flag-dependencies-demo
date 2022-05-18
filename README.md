@@ -1,4 +1,4 @@
-# dependent-flags-demo
+# flag-dependencies-demo
 
 A [demonstration](https://optimizely.github.io/flag-dependencies-demo/) of a simple implementation of "flag dependencies" with Optimizely Full Stack
 
