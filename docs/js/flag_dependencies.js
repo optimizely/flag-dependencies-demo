@@ -18,7 +18,6 @@ function decide(optimizelyClient, userContext, flagKey, options = null) {
 		// Make a "silent" decision (without firing a decision event) for this dependency flag
 		let decision = userContext.decide(dependency.flagKey, [
 			optimizelySdk.OptimizelyDecideOption.DISABLE_DECISION_EVENT,
-			optimizelySdk.OptimizelyDecideOption.IGNORE_USER_PROFILE_SERVICE,
 		]);
 
 		if (dependency.isSatisfiedBy(decision)) {
