@@ -1,0 +1,63 @@
+.inline-image {
+    display: block;
+    margin: 30px auto 30px auto;
+    border-radius: 4px;
+    max-width: 540px;
+    filter: drop-shadow(0 0 3px #F1F1F1);
+}
+
+.on {
+    color: green;
+}
+
+.off {
+    color: red;
+}
+
+.flag {
+    max-width: 390px;
+    margin: 0 auto 20px auto;
+    padding: 10px;
+    background: #F1F1F1;
+    border: 1px solid #E1E1E1;
+    border-radius: 4px;
+}
+
+.big {
+    max-width: 500px;
+}
+
+.flag-cfg {
+    font-family: monospace;
+}
+
+.global-config {
+    padding: 10px;
+    float: right;
+}
+
+.global-config-option {
+    margin-bottom: 5px;
+}
+
+.global-config-option label {
+    display: inline-block;
+    width: 80px;
+    text-align: right;
+}
+
+.global-config-option input {
+    width: 200px;
+}
+
+.top-layer {
+    margin-bottom: 50px;
+}
+
+span {
+    white-space: nowrap;
+}
+
+.ind {
+    margin-left: 0.7em;
+}

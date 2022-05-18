@@ -5,99 +5,225 @@
 	<meta name="description" content="A demo of dependent flags using Optimizely Full Stack">
 	<meta name="author" content="Peter Koomen">
 
-	<!--<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>-->
-	<script defer src="./js/alpine.cdn.min.js"></script>
-	<script type="module">
-		import * as optimizely from "./js/flag_dependencies.js";
-
-		// Load default static datafile
-		fetch("./js/8Aee8gXFsj4apUcNx59TD.json").then(response => {
-			return response.json();
-		}).then(datafile => {
-
-			window.decideWithDependencies = (flagKey, userId, attrs = {}) => {
-				let optimizelyClient = optimizely.createInstance({
-					datafile: datafile
-				});
-				let user = optimizelyClient.createUserContext(userId, attrs);
-				return optimizelyClient.decideWithDependencies(user, flagKey);
-			};
-
-		})
-
-	</script>
+	<script src="./js/leader-line/leader-line.min.js"></script>
+	<script type="module" src="./js/demo.js"></script>
 
 	<link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" href="css/skeleton.css">
-	<link rel="stylesheet" href="css/normalize.css">
-	<link rel="stylesheet" href="css/index.css">
+	<link rel="stylesheet" href="css/skeleton/skeleton.css">
+	<link rel="stylesheet" href="css/skeleton/normalize.css">
+	<link rel="stylesheet" href="css/skeleton/custom.css">
+	<link rel="stylesheet" href="css/demo.css">
 </head>
 
 <body>
 	<div class="container" x-data=" { 
-		sdkKey: 'abc123',
-		userId: 'user1234567', 
-		attrs: {
-			'in_audience_1': false,
-			'in_audience_2': false
-		}
+		sdkKey: 'LbmzK7viE2J2bP5ozmZR9',
+		userId: 'user1'
 	}">
 
-		<div class="global-config">
-			<div class="row">
-				<div class="three columns">
-					sdkKey:
-				</div>
-				<div class="three columns">
-					<input type="text" x-model="sdkKey"></input>
-				</div>
-			</div>
-			<div class="row">
-				<div class="three columns">
-					userId:
-				</div>
-				<div class="three columns">
-					<input type="text" x-model="userId"></input>
-				</div>
-			</div>
-
-		</div>
-
 		<section class="header">
-			<h2 class="title">Flag Dependencies Demo</h2>
+			<h2 class="title">Demo: Flag Dependencies</h2>
+			<p>An interactive demo of flag dependencies for Optimizely Full Stack implemented in vanilla JS</p>
 		</section>
 
-		<div class="docs-section" id="intro">
+		<div class="navbar-spacer"></div>
+		<nav class="navbar">
+			<div class="container">
+				<ul class="navbar-list">
+					<li class="navbar-item"><a class="navbar-link" href="#flags">Feature Flags</a></li>
+					<li class="navbar-item"><a class="navbar-link" href="#dependencies">Flag Dependencies</a></li>
+					<li class="navbar-item"><a class="navbar-link" href="#code">Code</a></li>
+				</ul>
+			</div>
+		</nav>
 
-			<h6 class="docs-header">What are flag dependencies?</h6>
-			<p>First things first: a
+		<div class="docs-section" id="flags">
+
+			<h6 class="docs-header">Feature flags</h6>
+			<p>A
 				<a
 					href="https://docs.developers.optimizely.com/experimentation/v4.0.0-full-stack/docs/create-feature-flags">
-					feature flag</a> allows you to turn software functionality on or off, or otherwise configure its
-				behavior, without deploying new code.
+					feature flag</a> allows you to turn software functionality on or off and configure its behavior
+				without deploying new code.
 			</p>
 
-			<p>Here's an example of a feature flag that uses a 50/50 <a
+			<img class="inline-image" src="images/example_flag.png" />
+
+			<p>This is an example of a feature flag that uses a 50/50 <a
 					href="https://docs.developers.optimizely.com/experimentation/v4.0.0-full-stack/docs/run-a-b-tests">A/B
 					test rule</a> to decide whether it is
-				<span class="on">on</span> or <span class="off">off</span>. Try changing the <code>userId</code> value
-				in the upper-right and then click the "Decide" button.
+				<span class="on">on</span> or <span class="off">off</span>.
 			</p>
 
-			<div class="flag" x-data="{ flagKey: 'example_flag', variationKey: '...' }">
-				<a class="button button-primary u-pull-right"
-					@click="variationKey = window.decideWithDependencies(flagKey, userId, attrs).variationKey"
-					href="#">Decide</a>
+			<div class="flag" x-data="{ 
+				flagKey: 'example_flag', 
+				userId: 'user1',
+				get user() { return optimizelyClient.createUserContext(this.userId) },
+				variationKey: null,
+				decide() { this.variationKey = this.user.decide(this.flagKey).variationKey }
+			}">
+
+				<input type="button" class="button-primary u-pull-right" value="Decide" @click="decide" />
+
 				<div class="flag-cfg">
 					flagKey: <span x-text="flagKey"></span><br />
+					userId: <input type="text" x-model="userId"><br />
 					variation: <span x-text="variationKey" :class="variationKey == 'off' ? 'off' : 'on'"></span>
 				</div>
 			</div>
+
+			<p>Try changing the userId value to "user2" and then click the "Decide".</p>
 		</div>
 
-	</div>
-	</div>
-	</div>
+		<div class="docs-section" id="dependencies">
+			<h6 class="docs-header">Flag Dependencies</h6>
+
+
+
+			<p>In the following example, <code>dependent_flag</code> depends on <code>example_flag</code>:</p>
+
+			<div class="flag top-layer" id="example_flag" x-data="{ 
+					flagKey: 'example_flag', 
+					userId: 'user10',
+					get user() { return optimizelyClient.createUserContext(this.userId) },
+					variationKey: null,
+					decide() { this.variationKey = this.user.decide(this.flagKey).variationKey }
+				}">
+
+				<input type="button" class="button-primary u-pull-right" value="Decide" @click="decide" />
+
+				<div class="flag-cfg">
+					flagKey: <span x-text="flagKey"></span><br />
+					userId: <input type="text" x-model="userId"><br />
+					variation: <span x-text="variationKey" :class="variationKey == 'off' ? 'off' : 'on'"></span>
+				</div>
+			</div>
+
+			<div class="flag" id="dependent_flag"
+				x-init="drawArrow('example_flag', 'dependent_flag', { path: 'straight' });" x-data="{ 
+						flagKey: 'dependent_flag', 
+						_depends_on() { return new deps.DependencyConfig(optimizelyClient, this.flagKey ).dependenciesStr },
+						userId: 'user10',
+						get user() { return optimizelyClient.createUserContext(this.userId) },
+						variationKey: null,
+						decide() { this.variationKey = deps.decide(optimizelyClient, this.user, this.flagKey).variationKey }
+					}">
+
+				<input type="button" class="button-primary u-pull-right" value="Decide" @click="decide" />
+
+				<div class="flag-cfg">
+					flagKey: <span x-text="flagKey"></span><br />
+					<span class="ind">_depends_on: "<span x-text="_depends_on"></span>"</span><br />
+					userId: <input type="text" x-model="userId"><br />
+					variation: <span x-text="variationKey" :class="variationKey == 'off' ? 'off' : 'on'"></span>
+				</div>
+			</div>
+
+			<p>For documentation on how to specify flag dependencies, see this project's <a
+					href="https://github.com/optimizely/flag-dependencies-demo/blob/master/docs/README.md">README.md</a>
+			</p>
+
+			<p>It is important to note that dependencies are evaluated <em>statelessly</em> in <a
+					href="https://github.com/optimizely/flag-dependencies-demo/blob/master/docs/js/flag_dependencies.js">flag_dependencies.js</a>.
+				When a decision is made for <code>dependent_flag</code>, its dependencies are satisfied if the specified
+				decision <em>
+					would have been made</em> for that user in that moment.</p>
+
+			<p>This means that a dependency may be satisfied <em>even if the flag it depends on has not previously been
+					decided/enabled for that user!</em>
+			</p>
+
+			<p>In the following example, try to find a userId value that satisfies <code>flag_3</code>'s dependencies:
+			</p>
+
+			<div class="row top-layer">
+				<div class="six columns">
+					<div class="flag" id="flag_1" x-data="{ 
+						flagKey: 'flag_1', 
+						userId: 'user1',
+						get user() { return optimizelyClient.createUserContext(this.userId) },
+						variationKey: null,
+						decide() { this.variationKey = deps.decide(optimizelyClient, this.user, this.flagKey).variationKey }
+					}">
+
+						<input type="button" class="button-primary u-pull-right" value="Decide" @click="decide" />
+
+						<div class="flag-cfg">
+							flagKey: <span x-text="flagKey"></span><br />
+							userId: <input type="text" x-model="userId"><br />
+							variation: <span x-text="variationKey" :class="variationKey == 'off' ? 'off' : 'on'"></span>
+						</div>
+					</div>
+				</div>
+				<div class="six columns">
+					<div class="flag" id="flag_2" x-data="{ 
+							flagKey: 'flag_2', 
+							userId: 'user1',
+							get user() { return optimizelyClient.createUserContext(this.userId) },
+							variationKey: null,
+							decide() { this.variationKey = deps.decide(optimizelyClient, this.user, this.flagKey).variationKey }
+						}">
+
+						<input type="button" class="button-primary u-pull-right" value="Decide" @click="decide" />
+
+						<div class="flag-cfg">
+							flagKey: <span x-text="flagKey"></span><br />
+							userId: <input type="text" x-model="userId"><br />
+							variation: <span x-text="variationKey" :class="variationKey == 'off' ? 'off' : 'on'"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+			<div class="flag big" id="flag_3" x-init="drawArrow('flag_1', 'flag_3'); drawArrow('flag_2', 'flag_3');"
+				x-data="{ 
+				flagKey: 'flag_3', 
+				_depends_on() { return new deps.DependencyConfig(optimizelyClient, this.flagKey ).dependenciesStr },
+				userId: 'user1',
+				get user() { return optimizelyClient.createUserContext(this.userId) },
+				variationKey: null,
+				decide() { this.variationKey = deps.decide(optimizelyClient, this.user, this.flagKey).variationKey }
+			}">
+
+				<input type="button" class="button-primary u-pull-right" value="Decide" @click="decide" />
+
+				<div class="flag-cfg">
+					flagKey: <span x-text="flagKey"></span><br />
+					<span class="ind">_depends_on: "<span x-text="_depends_on"></span>"</span><br />
+					userId: <input type="text" x-model="userId"><br />
+					variation: <span x-text="variationKey"
+						:class="variationKey == 'default_variation' ? 'off' : 'on'"></span>
+				</div>
+			</div>
+
+			<div class="docs-section" id="code">
+				<h6 class="docs-header">Source Code and Acknowledgements</h6>
+
+				<p>The full source code for this demo can be found <a
+						href="https://github.com/optimizely/flag-dependencies-demo">on Github</a>. The flag
+					dependency
+					implementation lives in <a
+						href="https://github.com/optimizely/flag-dependencies-demo/blob/master/docs/js/flag_dependencies.js">flag_dependencies.js</a>.
+				</p>
+
+				<p>
+					This demo is meant to be used as inspiration for your own implementation of flag dependencies.
+					It has
+					not been tested extensively and should not be run in any serious production environment. If you
+					find a
+					bug, please <a href="https://github.com/optimizely/flag-dependencies-demo/issues">file an
+						issue</a> or
+					(even better) <a href="https://github.com/optimizely/flag-dependencies-demo/pulls">create a pull
+						request</a>.
+				</p>
+
+				<p>Built with gratitude using <a href="http://getskeleton.com/">Skeleton</a>, <a
+						href="https://alpinejs.dev/">Alpine.js</a>, and <a
+						href="https://anseki.github.io/leader-line/">leader-line</a></p>
+			</div>
+
+		</div>
 
 </body>
 

@@ -1,34 +1,68 @@
 # dependent-flags-demo
 
-A [demonstration](https://koomen.github.io/dependent-flags-demo/) of a simple implementation of "flag dependencies" with Optimizely Full Stack
+A [demonstration](https://optimizely.github.io/flag-dependencies-demo/) of a simple implementation of "flag dependencies" with Optimizely Full Stack
 
 ## Try it out
 
-Check out the demo [here](https://koomen.github.io/dependent-flags-demo/).
+Check out the [interactive demo](https://optimizely.github.io/flag-dependencies-demo/).
 
-The source code is in the [docs](/docs) directory in this repository.
+The demo source code is in the [docs](/docs) directory in this repository. The flag dependency evaluation logic lives in [flag_dependencies.js](/docs/js/flag_dependencies.js). 
 
-## How it works
-
-[`optimizely_flag_dependencies.js`](/docs/optimizely_flag_dependencies.js) exports one function: `createInstance()`.
-
-This function behaves exactly like the Optimizely Full Stack [`createInstance()` method](https://docs.developers.optimizely.com/experimentation/v4.0.0-full-stack/docs/initialize-sdk-javascript) with one difference:
-
-`optimizely_flag_dependencies.createInstance()` returns an Optimizely client instance with an additional bound method, `decideWithDependencies()`.
-
-`decideDependencies()` takes three parameters: `userContext`, `flagKey`, and `options`. Calling 
+## Usage
 
 ```js
-  optimizelyClient.decideWithDependencies(user, flagKey, options)
+// Optimizely SDK
+import "https://unpkg.com/@optimizely/optimizely-sdk@4.9.1/dist/optimizely.browser.umd.min.js";
+
+// Flag Dependency module
+import * as deps from "./flag_dependencies.js";
+
+// Instantiate an Optimizely client
+let optimizelyClient = optimizelySdk.createInstance({
+  sdkKey : "LbmzK7viE2J2bP5ozmZR9"
+});
+
+// Create a context object for user123
+let user = optimizelyClient.createUserContext("user123");
+
+// Decide my_flag without evaluating dependencies
+let decision_without_dependencies = user.decide("my_flag");
+
+// Evaluate my_flag's dependencies statelessly and decide my_flag according to its rules if 
+// they are satisfied. Return the default variation if not.
+let decision_with_dependencies = deps.decide()
+
 ```
 
-is equivalent to the following [`decide()`](https://docs.developers.optimizely.com/experimentation/v4.0.0-full-stack/docs/decide-methods-javascript) method call: 
+## Specifying dependencies
+
+In the following example, `dependent_flag` uses a [targeted rollout rule](https://docs.developers.optimizely.com/experimentation/v4.0.0-full-stack/docs/run-flag-deliveries) and would normally evaluate to **on** for everyone. 
+
+<p align="center"><img width="600" src="docs/images/dependent_flag.png" /></p>
+
+However, we've added a special `_depends_on` [flag variable](https://docs.developers.optimizely.com/experimentation/v4.0.0-full-stack/docs/create-flag-variations#prerequisite-create-default-variables) to specify that `dependent_flag` depends on `example_flag`.
+
+<p align="center"><img width="600" src="docs/images/dependent_flag_variable.png" /></p>
+
+Dependencies are specified in `_depends_on`'s [default value](https://docs.developers.optimizely.com/experimentation/v4.0.0-full-stack/docs/create-flag-variations#prerequisite-create-default-variables) as a comma-separated list of dependencies that each take one of the following forms:
 
 ```js
-  user.decide(flagKey, options)
+  "flagKey"              // This flag depends on flagKey being enabled
+  "flagKey:variationKey" // This flag depends on flagKey's variationKey variation
 ```
 
-with one key difference: `decideWithDependencies(user, flagKey, options)` will check to see if `flagKey` has any dependencies specified via a comma-separated list in the default value of a special `_depends` [flag variable](https://docs.developers.optimizely.com/experimentation/v4.0.0-full-stack/docs/create-flag-variations), like this:
+When a the `decide()` function exported by [flag_dependencies.js](https://github.com/optimizely/flag-dependencies-demo/blob/master/docs/js/flag_dependencies.js) is used to make a decision for `dependent_flag` (see [Usage](#usage)), its dependencies are evaluated first.
 
-![Specifying flag dependencies](docs/img/dependencies.png)
+If all dependencies are satisifed, the decision returned will follow the flag's [delivery and experiment rules](https://docs.developers.optimizely.com/full-stack/v4.0/docs/create-flag-variations#use-flag-variations), as normal.
+
+If one or more dependencies are not satisfied, the **default variation**, specified by the "everyone else" rule in the flag's configuration, is returned.
+
+
+
+
+## Disclaimer and Acknowledgements
+
+This demo is meant to be used as inspiration for your own implementation of flag dependencies. It has not been tested extensively and **should not be run in any serious production environment**. If you find a bug, please [file an issue](https://github.com/optimizely/flag-dependencies-demo/issues) or (even better) [create a pull request](https://github.com/optimizely/flag-dependencies-demo/pulls).
+
+Built with gratitude using [Skeleton](http://getskeleton.com/), [Alpine.js](https://alpinejs.dev/), and [leader-line](https://anseki.github.io/leader-line/).
 
