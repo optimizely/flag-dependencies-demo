@@ -2,7 +2,7 @@
 
 A [demonstration](https://optimizely.github.io/flag-dependencies-demo/) of a simple implementation of "flag dependencies" with Optimizely Full Stack. 
 
-Check out this [video overview](https://www.loom.com/share/bee221cd914341a1ad86b062de991d4b)
+For a quick walkthrough of this demo, check out this [video overview](https://www.loom.com/share/bee221cd914341a1ad86b062de991d4b).
 
 ## Try it out
 
