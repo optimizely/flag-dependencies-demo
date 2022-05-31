@@ -1,6 +1,8 @@
 # flag-dependencies-demo
 
-A [demonstration](https://optimizely.github.io/flag-dependencies-demo/) of a simple implementation of "flag dependencies" with Optimizely Full Stack
+A [demonstration](https://optimizely.github.io/flag-dependencies-demo/) of a simple implementation of "flag dependencies" with Optimizely Full Stack. 
+
+Check out this [video overview](https://www.loom.com/share/bee221cd914341a1ad86b062de991d4b)
 
 ## Try it out
 
